@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    /* CENTRALIZED RICHBOYZ BUTTONS */
+    .btn-black {
+        @apply bg-black text-white px-10 py-4 font-black text-[10px] uppercase tracking-[0.3em] 
+               transition-all duration-300 active:scale-95 hover:bg-gray-900 border-none cursor-pointer inline-flex items-center justify-center;
+    }
+
+    .btn-outline {
+        @apply bg-transparent text-black border border-gray-200 px-10 py-4 font-black text-[10px] uppercase tracking-[0.3em] 
+               transition-all duration-300 active:scale-95 hover:bg-black hover:text-white cursor-pointer inline-flex items-center justify-center;
+    }
+
+    /* CENTRALIZED LUXURY CARDS */
+    .product-grid {
+        @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-16 items-stretch;
+    }
+
+    .luxury-card {
+        @apply flex flex-col h-full bg-[#FAF9F6] transition-all duration-700;
+    }
+
+    .luxury-image-wrapper {
+        @apply relative aspect-[3/4] overflow-hidden bg-[#F2F2F2] mb-6 border border-gray-50;
+    }
+
+    /* CENTRALIZED INPUTS */
+    .input-luxury {
+        @apply border-0 border-b-2 border-gray-100 bg-transparent py-4 font-black uppercase text-[11px] 
+               focus:ring-0 focus:border-black transition-colors placeholder:text-gray-300 w-full;
+    }
+}
