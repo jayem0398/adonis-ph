@@ -92,7 +92,7 @@ const submit = () => {
 
         <StudioNotification />
     </div>
-</template>
+</template>php artisan --version
 
 <style scoped>
 input { -webkit-tap-highlight-color: transparent; }

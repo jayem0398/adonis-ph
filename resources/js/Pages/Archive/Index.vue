@@ -5,22 +5,25 @@ import ProductCard from '@/Components/ProductCard.vue';
 import StudioNotification from '@/Components/StudioNotification.vue';
 
 const props = defineProps({
-    products: Array,
-    filters: Object
+    products: { type: Array, default: () => [] },
+    filters: { type: Object, default: () => ({}) }
 });
 
 const page = usePage();
 const isScrolled = ref(false);
-const selectedCategory = ref(props.filters.category || '');
+
+// Tinitingnan niya ang URL parameter kapag nag-load kung may bitbit na category, para auto-highlight!
+const urlParams = new URLSearchParams(window.location.search);
+const selectedCategory = ref(props.filters?.category || urlParams.get('category') || '');
 
 const cartCount = computed(() => page.props.cartCount || 0);
 const auth = computed(() => page.props.auth || { user: null });
 const isUserAdmin = computed(() => auth.value?.user && (auth.value.user.role === 'admin' || auth.value.user.is_admin));
 
 const categories = [
-    'BASIC COLLECTION',
-    'SEAMLESS EVERYDAY',
-    'SPORTS ACTIVE'
+    { label: 'BASIC COLLECTION', value: 'basic_collection' },
+    { label: 'SEAMLESS EVERYDAY', value: 'seamless_everyday' },
+    { label: 'SPORTS ACTIVE', value: 'sports_active' }
 ];
 
 watch(selectedCategory, (value) => {
@@ -37,7 +40,7 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
 
 <template>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-    <Head title="Archive Repository | ADONIS STUDIO" />
+    <Head title="Shop | ADONIS STUDIO" />
 
     <div class="min-h-screen bg-white flex flex-col antialiased text-zinc-900 font-['Inter'] selection:bg-[#10B981] selection:text-white overflow-x-hidden">
         
@@ -54,9 +57,13 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
             </Link>
             
             <div class="flex items-center gap-6 md:gap-10">
-                <Link :href="route('cart.index')" class="hidden md:block relative text-zinc-400 hover:text-[#10B981] transition-colors">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    <span v-if="cartCount > 0" class="absolute -top-1.5 -right-2 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
+                <Link :href="route('cart.index')" class="hidden md:flex items-center text-zinc-400 hover:text-[#10B981] transition-colors">
+                    <div class="relative inline-block">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                        <span v-if="cartCount > 0" class="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] bg-[#10B981] text-white rounded-full border-[2px] border-white font-black shadow-sm z-10">
+                            {{ cartCount }}
+                        </span>
+                    </div>
                 </Link>
 
                 <Link :href="auth.user ? (isUserAdmin ? route('admin.dashboard') : route('profile.edit')) : route('login')" class="p-1 text-zinc-400 hover:text-zinc-900 transition-colors">
@@ -65,11 +72,11 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
             </div>
         </nav>
 
-        <main class="flex-grow mt-24 md:mt-32 max-w-[1200px] mx-auto w-full px-4 md:px-6 pb-28 text-left font-black">
+        <main class="flex-grow mt-24 md:mt-32 max-w-[1200px] mx-auto w-full px-4 md:px-6 pb-28 text-left">
             <div class="flex flex-col gap-0.5 mb-8 border-b border-zinc-900 pb-4">
-                <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-bold italic">Step 01: Acquisition</span>
+                <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-bold italic">Our Products</span>
                 <h1 class="text-2xl md:text-4xl font-black uppercase tracking-tighter leading-none italic font-['Plus_Jakarta_Sans'] text-zinc-900">
-                    Archive <span class="text-zinc-200">Repository</span>
+                    Shop <span class="text-zinc-200">Collection</span>
                 </h1>
             </div>
 
@@ -78,14 +85,14 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
                     <button @click="selectedCategory = ''" 
                             :class="[selectedCategory === '' ? 'bg-zinc-900 text-white border-zinc-900 shadow-lg' : 'bg-zinc-50 text-zinc-400 border-zinc-100 hover:text-black']"
                             class="whitespace-nowrap px-6 py-3 border text-[8px] font-black uppercase tracking-[0.4em] transition-all italic rounded-lg active:scale-95 shrink-0">
-                        All Units
+                        All Products
                     </button>
                     
-                    <button v-for="cat in categories" :key="cat"
-                            @click="selectedCategory = cat"
-                            :class="[selectedCategory === cat ? 'bg-zinc-900 text-white border-zinc-900 shadow-lg' : 'bg-zinc-50 text-zinc-400 border-zinc-100 hover:text-black']"
+                    <button v-for="cat in categories" :key="cat.value"
+                            @click="selectedCategory = cat.value"
+                            :class="[selectedCategory === cat.value ? 'bg-zinc-900 text-white border-zinc-900 shadow-lg' : 'bg-zinc-50 text-zinc-400 border-zinc-100 hover:text-black']"
                             class="whitespace-nowrap px-6 py-3 border text-[8px] font-black uppercase tracking-[0.4em] transition-all italic rounded-lg active:scale-95 shrink-0">
-                        {{ cat }}
+                        {{ cat.label }}
                     </button>
                 </div>
             </header>
@@ -96,24 +103,24 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
                 </div>
             </div>
 
-            <div v-else class="py-32 md:py-48 text-center space-y-6 max-w-sm mx-auto font-black">
+            <div v-else class="py-32 md:py-48 text-center space-y-6 max-w-sm mx-auto">
                 <div class="inline-block p-10 bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-100 opacity-40 grayscale">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"/>
                     </svg>
                 </div>
                 <div class="space-y-1">
-                    <h2 class="text-xl font-black uppercase italic tracking-tighter font-['Plus_Jakarta_Sans']">No Units Found</h2>
-                    <p class="text-[9px] text-zinc-400 uppercase tracking-widest font-bold">No results matching your current acquisition filter.</p>
+                    <h2 class="text-xl font-black uppercase italic tracking-tighter font-['Plus_Jakarta_Sans']">No Products Found</h2>
+                    <p class="text-[9px] text-zinc-400 uppercase tracking-widest font-bold">Try selecting a different category.</p>
                 </div>
                 <button @click="selectedCategory = ''" class="inline-block w-full bg-zinc-900 text-white px-10 py-4 rounded-lg text-[9px] font-black uppercase tracking-[0.4em] hover:bg-[#10B981] transition-all shadow-xl italic active:scale-95">
-                    Clear All Filters
+                    Clear Filters
                 </button>
             </div>
         </main>
 
-        <footer class="hidden md:block bg-zinc-50 py-8 px-6 md:px-12 border-t border-zinc-200 mt-auto">
-            <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[8px] text-zinc-400 uppercase tracking-widest font-black">
+        <footer class="hidden md:block bg-zinc-50 py-8 px-6 md:px-12 border-t border-zinc-200 mt-auto text-[8px] text-zinc-400 uppercase tracking-widest font-black uppercase">
+            <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
                 <p>Copyright © 2026 Adonis Studio | All Rights Reserved</p>
                 <div class="flex gap-6">
                     <Link href="#" class="hover:text-zinc-900 transition-colors">Privacy Policy</Link>
@@ -139,9 +146,11 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
             </Link>
             
             <Link :href="route('cart.index')" class="relative flex flex-col items-center gap-1.5">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span v-if="cartCount > 0" class="absolute -top-1.5 right-0 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
-                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Bag</span>
+                <div class="relative inline-block">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span v-if="cartCount > 0" class="absolute -top-1.5 -right-2 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
+                </div>
+                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Cart</span>
             </Link>
         </nav>
 

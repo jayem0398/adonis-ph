@@ -46,7 +46,7 @@ class ProductController extends Controller
             $product = Product::create([
                 'name' => $request->name,
                 'category' => $request->category,
-                'description' => $request->description ?? 'Studio archival piece.',
+                'description' => $request->description ?? 'Premium quality product.',
                 'image_path' => $mainImagePath,
                 'is_featured' => $request->is_featured ?? false,
             ]);
@@ -67,7 +67,7 @@ class ProductController extends Controller
                     'sku' => strtoupper(Str::slug($product->name).'-'.$v['size'].'-'.Str::random(4)),
                 ]);
             }
-            return redirect()->back()->with('success', 'Unit archived.');
+            return redirect()->back()->with('success', 'Product added successfully.');
         });
     }
 
@@ -104,7 +104,7 @@ class ProductController extends Controller
             }
             $product->variants()->whereNotIn('id', $variantIds)->delete();
 
-            return redirect()->back()->with('success', 'Archive updated.');
+            return redirect()->back()->with('success', 'Product updated successfully.');
         });
     }
 
@@ -112,12 +112,12 @@ class ProductController extends Controller
         return DB::transaction(function () use ($product) {
             foreach ($product->images as $img) Storage::disk('public')->delete($img->image_path);
             $product->delete();
-            return redirect()->back()->with('success', 'Purged.');
+            return redirect()->back()->with('success', 'Product deleted successfully.');
         });
     }
 
     public function toggleFeatured(Product $product) {
         $product->update(['is_featured' => !$product->is_featured]);
-        return redirect()->back()->with('success', 'Status toggled.');
+        return redirect()->back()->with('success', 'Product status updated.');
     }
 }

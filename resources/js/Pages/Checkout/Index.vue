@@ -34,7 +34,7 @@ const finalTotal = computed(() => {
     return Math.max(0, total);
 });
 
-// FORM PROTOCOL (Auto-filled from props.auth.user)
+// FORM (Auto-filled from props.auth.user)
 const form = useForm({
     first_name: props.auth.user?.first_name || '', 
     last_name: props.auth.user?.last_name || '', 
@@ -49,7 +49,7 @@ const form = useForm({
     cart_ids: props.cart?.map(item => item.id) || []
 });
 
-// VOUCHER SYNC: Flash data watcher
+// VOUCHER SYNC
 watch(() => page.props.flash, (flash) => {
     if (flash?.success_voucher) {
         activeVoucher.value = flash.success_voucher;
@@ -63,11 +63,10 @@ watch(() => page.props.flash, (flash) => {
     }
 }, { deep: true, immediate: true });
 
-// REAL-TIME VOUCHER VALIDATION (DEBOUNCED)
+// VOUCHER VALIDATION
 let debounceTimer = null;
 watch(voucherInput, (newVal) => {
     clearTimeout(debounceTimer);
-    
     if (!newVal || newVal.trim() === '') {
         activeVoucher.value = null;
         form.voucher_code = null;
@@ -75,31 +74,13 @@ watch(voucherInput, (newVal) => {
         isValidating.value = false;
         return;
     }
-
     isValidating.value = true;
     voucherError.value = '';
-
     debounceTimer = setTimeout(() => {
-        router.post(route('checkout.validate_voucher'), { 
-            code: newVal.toUpperCase() 
-        }, {
+        router.post(route('checkout.validate_voucher'), { code: newVal.toUpperCase() }, {
             preserveState: true,
             preserveScroll: true,
-            onSuccess: (page) => {
-                const success = page.props.flash?.success_voucher;
-                if (!success) {
-                    activeVoucher.value = null;
-                    form.voucher_code = null;
-                }
-            },
-            onError: (errors) => {
-                voucherError.value = errors.code || 'Invalid Voucher Code';
-                activeVoucher.value = null;
-                form.voucher_code = null;
-            },
-            onFinish: () => {
-                isValidating.value = false;
-            }
+            onFinish: () => { isValidating.value = false; }
         });
     }, 600);
 });
@@ -107,12 +88,7 @@ watch(voucherInput, (newVal) => {
 const submit = () => {
     form.shipping_fee = shippingFee.value;
     form.total_amount = finalTotal.value;
-    
-    form.post(route('checkout.store'), { 
-        preserveScroll: true,
-        onSuccess: () => { console.log('Acquisition Committed.'); },
-        onError: (err) => { console.error('Acquisition Failed:', err); }
-    });
+    form.post(route('checkout.store'));
 };
 
 const handleScroll = () => { isScrolled.value = window.scrollY > 20; };
@@ -126,13 +102,12 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
 
 <template>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-    <Head title="Settlement Protocol | ADONIS STUDIO" />
+    <Head title="Checkout | ADONIS STUDIO" />
 
     <div class="min-h-screen bg-white flex flex-col antialiased text-zinc-900 font-['Inter'] selection:bg-[#10B981] selection:text-white font-black overflow-x-hidden">
         
         <nav :class="[isScrolled ? 'bg-white/95 backdrop-blur-md py-3 shadow-sm border-b border-zinc-100' : 'bg-white py-5 md:py-8 border-b border-zinc-50']" 
              class="fixed top-0 w-full z-[110] transition-all duration-500 px-6 md:px-12 flex items-center justify-between">
-            
             <div class="flex items-center gap-10">
                 <Link :href="route('welcome')" class="relative flex items-center group/nav">
                     <div class="bg-zinc-900 text-white h-7 md:h-9 px-2 flex items-center justify-center transition-all duration-500 group-hover/nav:md:px-5 relative overflow-hidden text-lg font-black">
@@ -143,12 +118,7 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
                         <span class="text-[5px] md:text-[6px] tracking-[0.45em] text-zinc-400 uppercase mt-0.5 italic font-bold">Philippines</span>
                     </div>
                 </Link>
-
-                <div v-if="props.cart?.length > 0" class="hidden md:flex items-center gap-8 border-l border-zinc-100 pl-10">
-                    <Link :href="route('archive.index')" class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-zinc-900 transition-colors">Shop All</Link>
-                </div>
             </div>
-
             <div class="flex items-center gap-6 md:gap-10">
                 <Link :href="auth.user ? (isUserAdmin ? route('admin.dashboard') : route('profile.edit')) : route('login')" 
                       class="p-1 text-zinc-400 hover:text-zinc-900 transition-colors">
@@ -161,79 +131,70 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
             
             <Link :href="route('cart.index')" class="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-zinc-900 mb-6 transition-all group w-fit">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="group-hover:-translate-x-1 transition-transform"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Return to Bag</span>
+                <span>Back to Cart</span>
             </Link>
 
             <div class="flex flex-col gap-0.5 mb-8 border-b border-zinc-900 pb-4">
-                <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-black italic">Step 03: Settlement</span>
-                <h1 class="text-3xl md:text-5xl uppercase tracking-tighter leading-none italic font-['Plus_Jakarta_Sans'] text-zinc-900">
-                    Checkout <span class="text-zinc-200">Protocol</span>
+                <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-black italic">Checkout Step 2 of 2</span>
+                <h1 class="text-2xl md:text-4xl uppercase tracking-tighter leading-none italic font-['Plus_Jakarta_Sans'] text-zinc-900">
+                    Shipping <span class="text-zinc-200">& Payment</span>
                 </h1>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                
                 <div class="lg:col-span-7">
                     <form @submit.prevent="submit" class="space-y-8">
                         <section class="space-y-6">
-                            <h2 class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400">Dispatch Details</h2>
-                            
+                            <h2 class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400">Shipping Details</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="space-y-1.5">
                                     <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">First Name</label>
-                                    <input v-model="form.first_name" type="text" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
+                                    <input v-model="form.first_name" type="text" placeholder="First Name" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">Last Name</label>
-                                    <input v-model="form.last_name" type="text" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
+                                    <input v-model="form.last_name" type="text" placeholder="Last Name" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
                                 </div>
                             </div>
-                            
                             <div class="space-y-1.5">
                                 <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">Full Address</label>
-                                <input v-model="form.address" type="text" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
+                                <input v-model="form.address" type="text" placeholder="House No., Street, Brgy." required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
                             </div>
-
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="space-y-1.5">
-                                    <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">City / Region</label>
-                                    <input v-model="form.city" type="text" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
+                                    <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">City / Province</label>
+                                    <input v-model="form.city" type="text" placeholder="City" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
                                 </div>
                                 <div class="space-y-1.5">
                                     <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">Phone Number</label>
-                                    <input v-model="form.phone" type="text" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
+                                    <input v-model="form.phone" type="text" placeholder="09XXXXXXXXX" required class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all">
                                 </div>
                             </div>
-
                             <div class="space-y-1.5">
-                                <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">Settlement Method</label>
+                                <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">Payment Method</label>
                                 <select v-model="form.payment_method" class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-bold uppercase p-4 outline-none focus:border-zinc-900 transition-all cursor-pointer appearance-none">
-                                    <option value="GCash">GCash // Paymongo</option>
-                                    <option value="Maya">Maya // Paymongo</option>
-                                    <option value="COD">Cash on Delivery</option>
+                                    <option value="GCash">GCash / E-Wallet</option>
+                                    <option value="Maya">Maya / E-Wallet</option>
+                                    <option value="COD">Cash on Delivery (COD)</option>
                                 </select>
                             </div>
-
                             <div class="space-y-1.5 pt-2">
-                                <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">Voucher Protocol</label>
+                                <label class="text-[8px] uppercase tracking-[0.2em] text-zinc-400 font-black">Promo Code</label>
                                 <div class="relative">
-                                    <input v-model="voucherInput" type="text" placeholder="ENTER CODE" 
-                                           class="w-full border bg-zinc-50 rounded-xl text-[10px] font-bold uppercase p-4 pr-12 focus:bg-white focus:border-zinc-900 outline-none transition-all"
+                                    <input v-model="voucherInput" type="text" placeholder="Enter Voucher" 
+                                           class="w-full border bg-zinc-50 rounded-xl text-[10px] font-bold uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all"
                                            :class="voucherError ? 'border-red-500' : (activeVoucher ? 'border-[#10B981]' : 'border-zinc-100')">
-                                    
-                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2">
                                         <div v-if="isValidating" class="w-3.5 h-3.5 border-2 border-zinc-300 border-t-zinc-900 rounded-full animate-spin"></div>
                                         <svg v-else-if="activeVoucher" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
-                                        <svg v-else-if="voucherError" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="4"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg>
                                     </div>
                                 </div>
-                                <div v-if="voucherError" class="text-[7px] text-red-500 font-black uppercase mt-2 tracking-widest">{{ voucherError }}</div>
-                                <div v-else-if="activeVoucher" class="text-[7px] text-[#10B981] font-black uppercase mt-2 tracking-widest">Protocol Active: {{ activeVoucher.code }}</div>
+                                <div v-if="voucherError" class="text-[7px] text-red-500 font-black uppercase mt-2">{{ voucherError }}</div>
+                                <div v-else-if="activeVoucher" class="text-[7px] text-[#10B981] font-black uppercase mt-2">Voucher Applied: {{ activeVoucher.code }}</div>
                             </div>
                         </section>
-
                         <button type="submit" :disabled="form.processing" class="group flex items-center justify-between w-full h-16 bg-zinc-900 text-white px-8 rounded-xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-[#10B981] transition-all shadow-xl active:scale-95 mt-8">
-                            <span>{{ form.processing ? 'Processing...' : 'Commit Acquisition' }}</span>
+                            <span>{{ form.processing ? 'Processing...' : 'Place Order Now' }}</span>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </button>
                     </form>
@@ -241,8 +202,7 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
 
                 <div class="lg:col-span-5 font-black">
                     <div class="bg-zinc-50 border border-zinc-100 rounded-2xl p-6 sticky top-32 space-y-6 shadow-sm">
-                        <h2 class="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400 border-b border-zinc-100 pb-3">Order Manifest</h2>
-                        
+                        <h2 class="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400 border-b border-zinc-100 pb-3">Order Summary</h2>
                         <div class="divide-y divide-zinc-100 max-h-[350px] overflow-y-auto no-scrollbar">
                             <div v-for="item in props.cart" :key="item.id" class="py-4 flex gap-4 items-center group">
                                 <div class="w-14 h-18 bg-white border border-zinc-100 rounded-lg overflow-hidden shrink-0">
@@ -250,24 +210,23 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
                                 </div>
                                 <div class="flex-1 text-left">
                                     <h4 class="text-[10px] font-black uppercase tracking-tight">{{ item.name }}</h4>
-                                    <span class="block text-[7px] text-zinc-400 uppercase font-bold mt-1">{{ item.quantity }} units // size {{ item.size }}</span>
+                                    <span class="block text-[7px] text-zinc-400 uppercase font-bold mt-1">Qty: {{ item.quantity }} | Size: {{ item.size }}</span>
                                 </div>
                                 <span class="text-[10px] font-black italic">{{ formatCurrency(item.price * item.quantity) }}</span>
                             </div>
                         </div>
-
                         <div class="pt-5 border-t border-zinc-200 space-y-4">
                             <div class="flex justify-between text-[8px] font-black uppercase tracking-widest text-zinc-400">
-                                <span>Sub-Valuation</span>
+                                <span>Subtotal</span>
                                 <span>{{ formatCurrency(subtotal) }}</span>
                             </div>
                             <div v-if="activeVoucher" class="flex justify-between text-[8px] font-black uppercase tracking-widest text-[#10B981]">
-                                <span>Protocol Discount</span>
+                                <span>Discount</span>
                                 <span>- {{ formatCurrency(discountAmount) }}</span>
                             </div>
                             <div class="flex justify-between items-end pt-5 border-t border-dashed border-zinc-300">
                                 <div class="flex flex-col">
-                                    <span class="text-[7px] uppercase tracking-[0.2em] font-black text-zinc-400 mb-1">Total Settlement</span>
+                                    <span class="text-[7px] uppercase tracking-[0.2em] font-black text-zinc-400 mb-1">Grand Total</span>
                                     <span class="text-4xl font-black italic tracking-tighter text-[#10B981] font-['Plus_Jakarta_Sans'] leading-none">
                                         {{ formatCurrency(finalTotal) }}
                                     </span>
@@ -279,13 +238,9 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
             </div>
         </main>
 
-        <footer class="hidden md:block bg-zinc-50 py-8 px-6 md:px-12 border-t border-zinc-200 mt-auto">
-            <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[8px] text-zinc-400 uppercase tracking-widest font-black">
+        <footer class="hidden md:block bg-zinc-50 py-8 px-6 md:px-12 border-t border-zinc-200 mt-auto text-[8px] text-zinc-400 uppercase tracking-widest font-black">
+            <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
                 <p>Copyright © 2026 Adonis Studio | All Rights Reserved</p>
-                <div class="flex gap-6">
-                    <Link href="#" class="hover:text-zinc-900 transition-colors">Privacy Policy</Link>
-                    <Link href="#" class="hover:text-zinc-900 transition-colors">Terms of Service</Link>
-                </div>
             </div>
         </footer>
     </div>
@@ -294,5 +249,4 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
 <style scoped>
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-input, select { -webkit-tap-highlight-color: transparent; }
 </style>

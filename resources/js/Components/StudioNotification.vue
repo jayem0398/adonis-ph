@@ -7,7 +7,7 @@ const show = ref(false);
 const message = ref('');
 const isError = ref(false);
 
-// Selyado: Watch for both success and error flashes
+// Watch for both success and error flashes
 watch(() => page.props.flash, (flash) => {
     if (flash?.success || flash?.error) {
         message.value = (flash.success || flash.error).replace(/_/g, ' ');
@@ -34,7 +34,7 @@ watch(() => page.props.flash, (flash) => {
             leave-from-class="opacity-100 scale-100"
             leave-to-class="opacity-0 scale-95"
         >
-            <div v-if="show" class="fixed bottom-24 md:bottom-10 left-0 right-0 md:left-auto md:right-10 z-[9999] flex justify-center px-6 pointer-events-none font-black">
+            <div v-if="show" class="fixed bottom-24 md:bottom-10 left-0 right-0 md:left-auto md:right-10 z-[9999] flex justify-center px-6 pointer-events-none">
                 
                 <div :class="[isError ? 'border-red-500/50' : 'border-emerald-500/50']" 
                      class="bg-zinc-950/95 backdrop-blur-md text-white flex items-center shadow-[0_20px_40px_rgba(0,0,0,0.4)] border pointer-events-auto overflow-hidden w-full max-w-[300px] md:w-auto md:min-w-[260px] rounded-xl relative">
@@ -50,7 +50,7 @@ watch(() => page.props.flash, (flash) => {
 
                         <div class="flex flex-col text-left">
                             <span class="text-[7px] uppercase tracking-[0.4em] text-zinc-500 leading-none mb-1 font-bold italic">
-                                {{ isError ? 'System_Error' : 'Protocol_Success' }}
+                                {{ isError ? 'Error' : 'Success' }}
                             </span>
                             <p class="text-[10px] md:text-[11px] font-black uppercase tracking-widest leading-none">
                                 {{ message }}
@@ -69,7 +69,6 @@ watch(() => page.props.flash, (flash) => {
     100% { width: 0%; }
 }
 
-/* Selyado: Mobile haptics shadow */
 @media (max-width: 768px) {
     .bg-zinc-950\/95 {
         box-shadow: 0 -10px 40px -10px rgba(0,0,0,0.5);

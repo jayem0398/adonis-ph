@@ -40,7 +40,7 @@ const addToCart = () => {
     form.post(route('cart.add'), { 
         preserveScroll: true,
         onSuccess: () => {
-            // Optional Feedback logic
+            // Success Feedback
         }
     });
 };
@@ -52,9 +52,9 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
 
 <template>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-    <Head :title="`${product.name} // Manifest`" />
+    <Head :title="`${product.name} | ADONIS STUDIO`" />
 
-    <div class="min-h-screen bg-white font-black antialiased text-zinc-900 selection:bg-[#10B981] selection:text-white font-['Inter'] flex flex-col overflow-x-hidden">
+    <div class="min-h-screen bg-white font-['Inter'] antialiased text-zinc-900 selection:bg-[#10B981] selection:text-white flex flex-col overflow-x-hidden">
         
         <nav :class="[isScrolled ? 'bg-white/95 backdrop-blur-md py-3 shadow-sm border-b border-zinc-100' : 'bg-white py-5 md:py-8 border-b border-zinc-50']" 
              class="fixed top-0 w-full z-[110] transition-all duration-500 px-6 md:px-12 flex items-center justify-between">
@@ -71,14 +71,18 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
                 </Link>
 
                 <div class="hidden md:flex items-center gap-8 border-l border-zinc-100 pl-10">
-                    <Link :href="route('archive.index')" class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-zinc-900 transition-colors">Archive</Link>
+                    <Link :href="route('archive.index')" class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-zinc-900 transition-colors">Shop All</Link>
                 </div>
             </div>
 
             <div class="flex items-center gap-6 md:gap-10">
-                <Link :href="route('cart.index')" class="hidden md:block relative text-zinc-400 hover:text-[#10B981] transition-colors">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    <span v-if="cartCount > 0" class="absolute -top-1.5 -right-2 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
+                <Link :href="route('cart.index')" class="hidden md:flex items-center text-zinc-400 hover:text-[#10B981] transition-colors">
+                    <div class="relative inline-block">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                        <span v-if="cartCount > 0" class="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] bg-[#10B981] text-white rounded-full border-[2px] border-white font-black shadow-sm z-10">
+                            {{ cartCount }}
+                        </span>
+                    </div>
                 </Link>
 
                 <Link :href="auth.user ? (isUserAdmin ? route('admin.dashboard') : route('profile.edit')) : route('login')" 
@@ -88,87 +92,87 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
             </div>
         </nav>
 
-        <main class="flex-grow mt-24 md:mt-32 max-w-[1200px] mx-auto w-full px-4 md:px-6 pb-28 text-left font-black">
+        <main class="flex-grow mt-24 md:mt-32 max-w-[1200px] mx-auto w-full px-4 md:px-6 pb-28 text-left">
             
             <div class="flex flex-col gap-0.5 mb-8 border-b border-zinc-900 pb-4">
-                <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-bold italic">Step 01: Acquisition</span>
+                <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-bold italic">Product Details</span>
                 <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tighter leading-none italic font-['Plus_Jakarta_Sans'] text-zinc-900">
-                    Unit <span class="text-zinc-200">Manifest</span>
+                    {{ product.name }}
                 </h1>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start font-black">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                 
-                <div class="lg:col-span-7 flex flex-col md:flex-row gap-4 font-black">
+                <div class="lg:col-span-7 flex flex-col md:flex-row gap-4">
                     <div v-if="product.images?.length > 0" 
                          class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto no-scrollbar shrink-0 md:w-16 md:max-h-[480px]">
                         
                         <button @click="activeImage = product.image_path"
-                                class="w-14 h-18 bg-zinc-50 border transition-all overflow-hidden shrink-0 rounded-lg font-black"
+                                class="w-14 h-18 bg-zinc-50 border transition-all overflow-hidden shrink-0 rounded-lg"
                                 :class="activeImage === product.image_path ? 'border-zinc-900 ring-2 ring-zinc-900/10' : 'border-zinc-100'">
-                            <img :src="getImageUrl(product.image_path)" class="w-full h-full object-cover font-black">
+                            <img :src="getImageUrl(product.image_path)" class="w-full h-full object-cover">
                         </button>
 
                         <button v-for="img in product.images" :key="img.id" @click="activeImage = img.image_path"
-                                class="w-14 h-18 bg-zinc-50 border transition-all overflow-hidden shrink-0 rounded-lg font-black"
+                                class="w-14 h-18 bg-zinc-50 border transition-all overflow-hidden shrink-0 rounded-lg"
                                 :class="activeImage === img.image_path ? 'border-zinc-900 ring-2 ring-zinc-900/10' : 'border-zinc-100'">
-                            <img :src="getImageUrl(img.image_path)" class="w-full h-full object-cover font-black">
+                            <img :src="getImageUrl(img.image_path)" class="w-full h-full object-cover">
                         </button>
                     </div>
 
-                    <div class="flex-1 bg-zinc-50 border border-zinc-100 aspect-[3/4] overflow-hidden group/img relative rounded-xl max-w-[420px] mx-auto lg:mx-0 shadow-sm font-black">
+                    <div class="flex-1 bg-zinc-50 border border-zinc-100 aspect-[3/4] overflow-hidden group/img relative rounded-xl max-w-[420px] mx-auto lg:mx-0 shadow-sm">
                         <div v-if="isFullySoldOut" class="absolute inset-0 z-20 flex items-center justify-center bg-zinc-900/60 backdrop-blur-sm">
                             <div class="border border-white/50 px-5 py-2.5 transform -rotate-12 font-black">
                                 <span class="text-white text-sm uppercase font-black italic tracking-[0.4em]">Sold Out</span>
                             </div>
                         </div>
                         <img :src="getImageUrl(activeImage)" 
-                             class="w-full h-full object-cover transition-all duration-700 group-hover/img:scale-105 font-black">
+                             class="w-full h-full object-cover transition-all duration-700 group-hover/img:scale-105">
                     </div>
                 </div>
 
-                <div class="lg:col-span-5 space-y-8 lg:sticky lg:top-40 font-black">
-                    <div class="space-y-3 font-black">
-                        <div class="flex items-center gap-2 font-black">
-                            <span class="text-[7px] uppercase tracking-[0.5em] text-[#10B981] italic font-black">Ref: {{ String(product.id).padStart(4, '0') }}</span>
+                <div class="lg:col-span-5 space-y-8 lg:sticky lg:top-40">
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[7px] uppercase tracking-[0.5em] text-[#10B981] italic font-black">SKU: {{ String(product.id).padStart(4, '0') }}</span>
                             <span class="text-zinc-200">//</span>
                             <span class="text-[7px] uppercase tracking-[0.4em] text-zinc-400 italic font-black">{{ product.category }}</span>
                         </div>
                         <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter leading-[0.9] italic font-['Plus_Jakarta_Sans']">{{ product.name }}</h2>
                         <p class="text-[9px] text-zinc-500 uppercase tracking-widest leading-relaxed italic max-w-sm font-black">
-                            {{ product.description || 'Archival studio piece designed for identity and movement.' }}
+                            {{ product.description || 'Premium collection designed for comfort and identity. Manila documented.' }}
                         </p>
                     </div>
 
-                    <div class="space-y-6 pt-6 border-t border-zinc-100 font-black">
-                        <div class="space-y-3 font-black">
-                            <label class="text-[7px] uppercase tracking-[0.5em] text-zinc-400 font-black">Configuration Selection</label>
-                            <div class="grid grid-cols-4 gap-2 font-black">
+                    <div class="space-y-6 pt-6 border-t border-zinc-100">
+                        <div class="space-y-3">
+                            <label class="text-[7px] uppercase tracking-[0.5em] text-zinc-400 font-black">Select Size</label>
+                            <div class="grid grid-cols-4 gap-2">
                                 <button v-for="v in product.variants" :key="v.id" @click="form.variant_id = v.id"
                                         :disabled="v.stock <= 0"
                                         :class="[
-                                            form.variant_id === v.id ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white border-zinc-100 text-zinc-400 hover:text-black hover:border-zinc-300',
+                                            form.variant_id === v.id ? 'bg-zinc-900 text-white border-zinc-900 shadow-lg' : 'bg-white border-zinc-100 text-zinc-400 hover:text-black hover:border-zinc-300',
                                             v.stock <= 0 ? 'opacity-30 border-dashed cursor-not-allowed' : ''
                                         ]"
-                                        class="h-9 border text-[8px] font-black uppercase transition-all italic rounded-lg font-black">
+                                        class="h-9 border text-[8px] font-black uppercase transition-all italic rounded-lg">
                                     {{ v.size }}
                                 </button>
                             </div>
                         </div>
 
-                        <div class="pt-6 space-y-5 font-black">
-                            <div class="flex justify-between items-end font-black">
-                                <span class="text-[8px] uppercase tracking-[0.4em] text-zinc-400 italic font-black">Valuation</span>
+                        <div class="pt-6 space-y-5">
+                            <div class="flex justify-between items-end">
+                                <span class="text-[8px] uppercase tracking-[0.4em] text-zinc-400 italic font-black">Price</span>
                                 <span class="text-2xl font-black tracking-tighter italic font-['Plus_Jakarta_Sans']">
                                     ₱{{ selectedVariant ? parseFloat(selectedVariant.price).toLocaleString() : '—' }}
                                 </span>
                             </div>
 
                             <button @click="addToCart" :disabled="isSelectedVariantSoldOut || form.processing" 
-                                    class="group flex items-center justify-between w-full h-12 px-6 text-[8px] font-black uppercase tracking-[0.5em] transition-all active:scale-95 disabled:cursor-not-allowed rounded-xl shadow-lg font-black"
+                                    class="group flex items-center justify-between w-full h-12 px-6 text-[8px] font-black uppercase tracking-[0.5em] transition-all active:scale-95 disabled:cursor-not-allowed rounded-xl shadow-xl"
                                     :class="[isSelectedVariantSoldOut ? 'bg-zinc-100 text-zinc-400' : 'bg-black text-white hover:bg-[#10B981]']">
-                                <span>{{ isSelectedVariantSoldOut ? 'Depleted' : (form.processing ? 'Syncing...' : 'Acquire Piece') }}</span>
-                                <svg v-if="!isSelectedVariantSoldOut" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="group-hover:translate-x-1 transition-transform font-black"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                <span>{{ isSelectedVariantSoldOut ? 'Out of Stock' : (form.processing ? 'Adding...' : 'Add to Cart') }}</span>
+                                <svg v-if="!isSelectedVariantSoldOut" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                             </button>
                         </div>
                     </div>
@@ -176,8 +180,8 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
             </div>
         </main>
 
-        <footer class="hidden md:block bg-zinc-50 py-8 px-6 md:px-12 border-t border-zinc-200 mt-auto">
-            <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[8px] text-zinc-400 uppercase tracking-widest font-black">
+        <footer class="hidden md:block bg-zinc-50 py-8 px-6 md:px-12 border-t border-zinc-200 mt-auto text-[8px] text-zinc-400 uppercase tracking-widest font-black">
+            <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
                 <p>Copyright © 2026 Adonis Studio | All Rights Reserved</p>
                 <div class="flex gap-6">
                     <Link href="#" class="hover:text-zinc-900 transition-colors">Privacy Policy</Link>
@@ -203,9 +207,13 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
             </Link>
             
             <Link :href="route('cart.index')" class="relative flex flex-col items-center gap-1.5">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span v-if="cartCount > 0" class="absolute -top-1.5 right-0 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
-                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Bag</span>
+                <div class="relative inline-block">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span v-if="cartCount > 0" class="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] bg-[#10B981] text-white rounded-full border-[2px] border-white font-black shadow-sm z-20">
+                        {{ cartCount }}
+                    </span>
+                </div>
+                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Cart</span>
             </Link>
         </nav>
 

@@ -17,12 +17,22 @@ class CheckoutController extends Controller
 {
     public function index(Request $request)
     {
-        // KUNIN ANG IDS MULA SA URL QUERY (?ids[]=1&ids[]=2)
-        $selectedIds = $request->query('ids', []);
+        // 1. Kunin ang 'ids' mula sa request
+        $idsParam = $request->query('ids', '');
+        
+        $selectedIds = [];
+
+        // 2. SIGURADUHIN na magiging Array ito bago ipasa sa query
+        if (is_string($idsParam) && $idsParam !== '') {
+            // Kung "1,2,3" ang format, gagawin nating [1, 2, 3]
+            $selectedIds = explode(',', $idsParam);
+        } elseif (is_array($idsParam)) {
+            $selectedIds = $idsParam;
+        }
 
         $query = Cart::where('user_id', Auth::id())->with(['variant.product']);
 
-        // SELYADO: Kung may sinend na IDs, i-filter lang yung mga yun
+        // 3. Dito na natin gagamitin ang array. Hindi na ito mag-eerror sa Builder.php
         if (!empty($selectedIds)) {
             $query->whereIn('id', $selectedIds);
         }
@@ -30,7 +40,7 @@ class CheckoutController extends Controller
         $cartItems = $query->get();
         
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Archive Error: No units selected for settlement.');
+            return redirect()->route('cart.index')->with('error', 'No valid items found for checkout.');
         }
 
         $cartMapped = $cartItems->map(function($item) {
@@ -44,7 +54,7 @@ class CheckoutController extends Controller
             ];
         });
 
-        return Inertia::render('Checkout', [
+        return Inertia::render('Checkout/Index', [
             'cart' => $cartMapped,
             'auth' => ['user' => Auth::user()]
         ]);
@@ -57,15 +67,15 @@ class CheckoutController extends Controller
         $voucher = Voucher::where('code', $code)->where('is_active', true)->first();
 
         if (!$voucher) {
-            return back()->with('error_voucher', 'Protocol Error: Code unrecognized.');
+            return back()->with('error_voucher', 'Invalid voucher code.');
         }
 
         if ($voucher->usage_limit > 0 && $voucher->used_count >= $voucher->usage_limit) {
-            return back()->with('error_voucher', 'Protocol Error: Voucher Depleted.');
+            return back()->with('error_voucher', 'Voucher usage limit reached.');
         }
 
         if ($voucher->expires_at && Carbon::parse($voucher->expires_at)->isPast()) {
-            return back()->with('error_voucher', 'Protocol Error: Code Expired.');
+            return back()->with('error_voucher', 'Voucher has expired.');
         }
 
         return back()->with('success_voucher', [
@@ -86,10 +96,9 @@ class CheckoutController extends Controller
             'city' => 'required|string',
             'payment_method' => 'required|string',
             'voucher_code' => 'nullable|string',
-            'cart_ids' => 'required|array' // Idagdag natin ito para alam kung ano lang ang idedelete
+            'cart_ids' => 'required|array'
         ]);
 
-        // Kunin lang yung specific cart items na binili
         $cartItems = Cart::whereIn('id', $request->cart_ids)
             ->where('user_id', Auth::id())
             ->with(['variant.product'])
@@ -119,7 +128,7 @@ class CheckoutController extends Controller
             $order = DB::transaction(function () use ($request, $cartItems, $finalTotal, $activeVoucherModel) {
                 foreach ($cartItems as $item) {
                     if ($item->variant->stock < $item->quantity) {
-                        throw new \Exception("Stock error for {$item->variant->product->name}");
+                        throw new \Exception("Insufficient stock for {$item->variant->product->name}");
                     }
                 }
 
@@ -156,7 +165,6 @@ class CheckoutController extends Controller
                     }
                 }
 
-                // SELYADO: Delete lang yung cart items na kasama sa order na ito
                 Cart::whereIn('id', $request->cart_ids)->where('user_id', Auth::id())->delete();
                 
                 return $newOrder;
@@ -165,7 +173,7 @@ class CheckoutController extends Controller
             return redirect()->route('checkout.success', $order->id);
         } catch (\Exception $e) {
             \Log::error('Checkout Failed: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'System Error: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Checkout Failed: ' . $e->getMessage()]);
         }
     }
 

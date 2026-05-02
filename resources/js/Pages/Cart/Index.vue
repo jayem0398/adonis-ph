@@ -42,17 +42,19 @@ const updateQuantity = (id, quantity) => {
 };
 
 const removeItem = (id) => {
-    if (confirm('Remove this unit from your bag?')) {
+    if (confirm('Remove this item from your cart?')) {
         router.delete(route('cart.destroy', id), { preserveScroll: true });
     }
 };
 
 const proceedToCheckout = () => {
     if (selectedItems.value.length === 0) {
-        alert('Please select at least one unit to proceed.');
+        alert('Please select at least one item to proceed.');
         return;
     }
-    router.get(route('checkout.index'), { ids: selectedItems.value });
+    // BULLETPROOF FIX: Iko-convert natin ang proxy array to plain comma-separated string
+    const safeIds = Array.from(selectedItems.value).join(',');
+    router.get(route('checkout.index'), { ids: safeIds });
 };
 
 const formatCurrency = (val) => new Intl.NumberFormat('en-PH', { 
@@ -62,9 +64,9 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
 
 <template>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-    <Head title="Shopping Bag | ADONIS STUDIO" />
+    <Head title="Your Cart | ADONIS STUDIO" />
 
-    <div class="min-h-screen bg-white flex flex-col antialiased text-zinc-900 font-['Inter'] selection:bg-[#10B981] selection:text-white overflow-x-hidden">
+    <div class="min-h-screen bg-white flex flex-col antialiased text-zinc-900 font-['Inter'] selection:bg-[#10B981] selection:text-white font-black overflow-x-hidden">
         
         <nav :class="[isScrolled ? 'bg-white/95 backdrop-blur-md py-3 shadow-sm border-b border-zinc-100' : 'bg-white py-5 md:py-8 border-b border-zinc-50']" 
              class="fixed top-0 w-full z-[110] transition-all duration-500 px-6 md:px-12 flex items-center justify-between">
@@ -81,14 +83,18 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
                 </Link>
 
                 <div v-if="cartItems.length > 0" class="hidden md:flex items-center gap-8 border-l border-zinc-100 pl-10">
-                    <Link :href="route('archive.index')" class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-zinc-900 transition-colors">Shop</Link>
+                    <Link :href="route('archive.index')" class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-zinc-900 transition-colors">Shop All</Link>
                 </div>
             </div>
 
             <div class="flex items-center gap-6 md:gap-10">
-                <Link :href="route('cart.index')" class="hidden md:block relative text-[#10B981] transition-colors">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    <span v-if="cartCount > 0" class="absolute -top-1.5 -right-2 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
+                <Link :href="route('cart.index')" class="hidden md:flex items-center text-[#10B981] transition-colors">
+                    <div class="relative inline-block">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                        <span v-if="cartCount > 0" class="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] bg-[#10B981] text-white rounded-full border-[2px] border-white font-black shadow-sm z-10">
+                            {{ cartCount }}
+                        </span>
+                    </div>
                 </Link>
 
                 <Link :href="auth.user ? (isUserAdmin ? route('admin.dashboard') : route('profile.edit')) : route('login')" 
@@ -98,13 +104,13 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
             </div>
         </nav>
 
-        <main class="flex-grow mt-24 md:mt-32 max-w-[1200px] mx-auto w-full px-4 md:px-6 pb-28 text-left font-black">
+        <main class="flex-grow mt-24 md:mt-32 max-w-[1200px] mx-auto w-full px-4 md:px-6 pb-28 text-left">
             
             <div class="flex justify-between items-end mb-8 border-b border-zinc-900 pb-4">
                 <div class="flex flex-col gap-0.5">
-                    <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-bold italic">Step 02: Verification</span>
-                    <h1 class="text-3xl md:text-5xl uppercase tracking-tighter leading-none italic font-['Plus_Jakarta_Sans'] text-zinc-900">
-                        Shopping <span class="text-zinc-200">Bag</span>
+                    <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-bold italic">Your Cart</span>
+                    <h1 class="text-2xl md:text-4xl font-black uppercase tracking-tighter leading-none italic font-['Plus_Jakarta_Sans'] text-zinc-900">
+                        Shopping <span class="text-zinc-200">Cart</span>
                     </h1>
                 </div>
 
@@ -139,7 +145,7 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
                                 <div class="flex justify-between items-start">
                                     <div class="space-y-0.5">
                                         <h3 class="text-[10px] md:text-xs uppercase tracking-tight italic font-['Plus_Jakarta_Sans'] leading-none">{{ item.name }}</h3>
-                                        <p class="text-[7px] text-zinc-400 uppercase tracking-widest font-bold">Size: {{ item.size }} // Unit Index</p>
+                                        <p class="text-[7px] text-zinc-400 uppercase tracking-widest font-bold">Size: {{ item.size }}</p>
                                     </div>
                                     <button @click="removeItem(item.id)" class="text-zinc-300 hover:text-red-500 transition-colors">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -154,7 +160,7 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
                                     <span class="w-8 text-center text-[9px] font-bold">{{ item.quantity }}</span>
                                     <button @click="updateQuantity(item.id, item.quantity + 1)" class="px-3 py-1.5 hover:bg-zinc-50 border-l border-zinc-200 text-[10px]">+</button>
                                 </div>
-                                <span class="text-[7px] uppercase tracking-widest text-zinc-400 font-bold italic">Adjust Units</span>
+                                <span class="text-[7px] uppercase tracking-widest text-zinc-400 font-bold italic">Adjust Quantity</span>
                             </div>
                         </div>
                     </div>
@@ -162,19 +168,18 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
 
                 <div class="lg:col-span-5">
                     <div class="bg-zinc-900 text-white p-8 rounded-xl space-y-6 sticky top-32 shadow-2xl relative overflow-hidden border-b-4 border-[#10B981] italic">
-                        <div class="absolute top-5 right-5 text-[6px] text-zinc-700 font-mono tracking-widest uppercase">ADX-NODE-BAG</div>
                         
-                        <h2 class="text-[9px] uppercase tracking-[0.3em] text-zinc-500 border-b border-zinc-800 pb-3">Bag Summary</h2>
+                        <h2 class="text-[9px] uppercase tracking-[0.3em] text-zinc-500 border-b border-zinc-800 pb-3">Order Summary</h2>
                         
                         <div class="space-y-4">
                             <div class="flex justify-between items-center text-[8px] uppercase tracking-widest text-zinc-500">
-                                <span>Selected Val.</span>
+                                <span>Selected Items Subtotal</span>
                                 <span class="text-white">{{ formatCurrency(selectedSubtotal) }}</span>
                             </div>
                             
                             <div class="pt-6 border-t border-dashed border-zinc-800 flex justify-between items-end">
                                 <div class="flex flex-col">
-                                    <span class="text-[8px] uppercase tracking-[0.2em] font-bold text-zinc-500 mb-0.5">Selection Total</span>
+                                    <span class="text-[8px] uppercase tracking-[0.2em] font-bold text-zinc-500 mb-0.5">Total</span>
                                     <span class="text-3xl italic tracking-tighter leading-none text-[#10B981] font-['Plus_Jakarta_Sans']">{{ formatCurrency(selectedSubtotal) }}</span>
                                 </div>
                             </div>
@@ -182,7 +187,7 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
 
                         <button @click="proceedToCheckout" 
                                 class="group flex items-center justify-between w-full h-14 bg-white text-zinc-900 px-6 rounded-lg text-[9px] uppercase tracking-[0.4em] hover:bg-[#10B981] hover:text-white transition-all shadow-xl active:scale-95">
-                            <span>Proceed ({{ selectedItems.length }}) Items</span>
+                            <span>Proceed to Checkout ({{ selectedItems.length }} Items)</span>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </button>
                     </div>
@@ -191,14 +196,14 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
 
             <div v-else class="py-32 md:py-48 text-center space-y-6 max-w-sm mx-auto">
                 <div class="inline-block p-10 bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-200 opacity-60 grayscale">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="21" r="2"/><circle cx="19" cy="21" r="2"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
                 </div>
                 <div class="space-y-2">
-                    <h2 class="text-2xl uppercase italic tracking-tighter font-['Plus_Jakarta_Sans']">Bag Empty</h2>
-                    <p class="text-[9px] text-zinc-400 uppercase tracking-widest font-bold">No units detected in persistent storage.</p>
+                    <h2 class="text-2xl uppercase italic tracking-tighter font-['Plus_Jakarta_Sans']">Cart is Empty</h2>
+                    <p class="text-[9px] text-zinc-400 uppercase tracking-widest font-bold">You have no items in your shopping cart.</p>
                 </div>
                 <Link :href="route('archive.index')" class="inline-block w-full bg-zinc-900 text-white px-10 py-4.5 rounded-xl text-[9px] uppercase tracking-[0.4em] hover:bg-[#10B981] transition-all shadow-xl italic mt-4">
-                    Return to Store
+                    Continue Shopping
                 </Link>
             </div>
         </main>
@@ -230,9 +235,13 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
             </Link>
             
             <Link :href="route('cart.index')" class="relative flex flex-col items-center gap-1.5">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span v-if="cartCount > 0" class="absolute -top-1.5 right-0 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
-                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Bag</span>
+                <div class="relative inline-block">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span v-if="cartCount > 0" class="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] bg-[#10B981] text-white rounded-full border-[2px] border-white font-black shadow-sm z-20">
+                        {{ cartCount }}
+                    </span>
+                </div>
+                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Cart</span>
             </Link>
         </nav>
 
@@ -243,4 +252,5 @@ const formatCurrency = (val) => new Intl.NumberFormat('en-PH', {
 <style scoped>
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+input[type="checkbox"] { -webkit-tap-highlight-color: transparent; }
 </style>

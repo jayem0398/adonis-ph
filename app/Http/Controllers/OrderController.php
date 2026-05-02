@@ -50,7 +50,7 @@ class OrderController extends Controller
     public function cancel(Request $request, $id)
     {
         $order = Order::where('user_id', auth()->id())
-            ->where('status', 'pending') // Double check status
+            ->where('status', 'pending')
             ->findOrFail($id);
 
         $request->validate([
@@ -65,14 +65,13 @@ class OrderController extends Controller
             'cancelled_at' => now(),
         ]);
 
-        // Protocol: Ibalik ang stocks sa inventory
         foreach ($order->items as $item) {
             if ($item->variant) {
                 $item->variant->increment('stock', $item->quantity);
             }
         }
 
-        return back()->with('success', 'Transaction cancelled. Stocks have been restored to repository.');
+        return back()->with('success', 'Order cancelled successfully. Stocks have been restored.');
     }
 
     /**
@@ -81,16 +80,15 @@ class OrderController extends Controller
     public function returnRequest(Request $request, $id)
     {
         $order = Order::where('user_id', auth()->id())
-            ->where('status', 'delivered') // Only delivered can be returned
+            ->where('status', 'delivered')
             ->findOrFail($id);
 
         $request->validate([
             'reason_type' => 'required|string',
             'description' => 'nullable|string',
-            'proof' => 'required|file|mimes:jpg,jpeg,png,mp4,mov|max:20480', // Max 20MB
+            'proof' => 'required|file|mimes:jpg,jpeg,png,mp4,mov|max:20480',
         ]);
 
-        // Store proof file in public/returns folder
         $proofPath = null;
         if ($request->hasFile('proof')) {
             $proofPath = $request->file('proof')->store('returns', 'public');
@@ -103,6 +101,6 @@ class OrderController extends Controller
             'return_proof_path' => $proofPath,
         ]);
 
-        return back()->with('success', 'Return request submitted. Awaiting studio verification.');
+        return back()->with('success', 'Return request submitted. Awaiting admin approval.');
     }
 }

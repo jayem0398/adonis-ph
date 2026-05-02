@@ -33,7 +33,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Check if the authenticated user is an admin based on role or is_admin flag
+        if ($request->user()->role === 'admin' || $request->user()->is_admin) {
+            // Redirect admins to their specific dashboard
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
+        // Redirect regular users to the public homepage/welcome route
+        return redirect()->intended(route('welcome', absolute: false));
     }
 
     /**
@@ -47,6 +54,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
+        // Redirect all users to the homepage after logging out
         return redirect('/');
     }
 }

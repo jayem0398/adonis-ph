@@ -24,9 +24,9 @@ const scrollContainer = ref(null);
 const canScrollLeft = ref(false);
 
 const collections = [
-    { name: 'BASIC COLLECTION', slug: 'basic', desc: 'EVERYDAY WEAR', img: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800' },
-    { name: 'SEAMLESS SERIES', slug: 'seamless', desc: 'COMFORT AND STYLE', img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800' },
-    { name: 'SPORTSWEAR', slug: 'sports', desc: 'ACTIVE LIFESTYLE', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800' }
+    { name: 'BASIC COLLECTION', slug: 'basic_collection', desc: 'EVERYDAY WEAR', img: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800' },
+    { name: 'SEAMLESS EVERYDAY', slug: 'seamless_everyday', desc: 'COMFORT AND STYLE', img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800' },
+    { name: 'SPORTS ACTIVE', slug: 'sports_active', desc: 'ACTIVE LIFESTYLE', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800' }
 ];
 
 const updateScrollButtons = () => {
@@ -49,12 +49,8 @@ const handleScroll = () => {
     showBackToTop.value = window.scrollY > 500;
 };
 
-const filterByCategory = (category) => {
-    router.get(route('archive.index'), { category: category });
-};
-
 const subscribeNewsletter = () => {
-    console.log('Newsletter Protocol Triggered');
+    console.log('Newsletter Subscription Triggered');
 };
 
 onMounted(() => {
@@ -83,8 +79,18 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
                     <span class="text-[5px] md:text-[6px] tracking-[0.45em] text-zinc-400 uppercase mt-0.5 italic font-bold">Philippines</span>
                 </div>
             </Link>
-            <div class="flex items-center gap-10">
-                <Link :href="auth.user ? (isUserAdmin ? route('admin.products.index') : route('profile.edit')) : route('login')" class="p-1 hover:text-[#10B981] transition-colors">
+            
+            <div class="flex items-center gap-6 md:gap-10">
+                <Link :href="route('cart.index')" class="hidden md:flex items-center text-zinc-900 hover:text-[#10B981] transition-colors">
+                    <div class="relative inline-block">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                        <span v-if="displayCartCount > 0" class="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] bg-[#10B981] text-white rounded-full border-[2px] border-white font-black shadow-sm z-10">
+                            {{ displayCartCount }}
+                        </span>
+                    </div>
+                </Link>
+
+                <Link :href="auth.user ? (isUserAdmin ? route('admin.dashboard') : route('profile.edit')) : route('login')" class="p-1 hover:text-[#10B981] transition-colors">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
                 </Link>
             </div>
@@ -129,7 +135,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
             <div class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
                 <div class="lg:col-span-6 space-y-8 text-left">
                     <div class="space-y-2">
-                        <span class="text-[9px] text-[#10B981] uppercase tracking-[0.8em] italic block">Brand Protocol | 001</span>
+                        <span class="text-[9px] text-[#10B981] uppercase tracking-[0.8em] italic block">Brand Standard | 001</span>
                         <h2 class="text-4xl md:text-6xl tracking-tighter leading-[0.9] italic uppercase">DESIGNED FOR <br/> <span class="text-zinc-200 not-italic">EVERY MOVEMENT</span></h2>
                     </div>
                     <p class="text-[11px] text-zinc-500 uppercase tracking-widest leading-loose max-w-lg italic">Adonis Studio is dedicated to creating premium apparel that adapts to your modern lifestyle. Quality Manila documented.</p>
@@ -150,14 +156,15 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
         <section class="bg-white py-16 md:py-20 px-6 md:px-12 max-w-[1400px] mx-auto border-b border-zinc-100">
             <div class="flex justify-between items-end mb-8">
                 <div class="space-y-1">
-                    <span class="text-[9px] text-[#10B981] tracking-[0.5em] uppercase">Archive Index</span>
-                    <h2 class="text-2xl md:text-3xl uppercase tracking-tighter italic leading-none">UNIT COLLECTIONS</h2>
+                    <span class="text-[9px] text-[#10B981] tracking-[0.5em] uppercase">Shop By Category</span>
+                    <h2 class="text-2xl md:text-3xl uppercase tracking-tighter italic leading-none">OUR COLLECTIONS</h2>
                 </div>
                 <Link :href="route('archive.index')" class="text-[8px] uppercase tracking-[0.3em] border-b border-zinc-900 pb-1">Shop All</Link>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
-                <div v-for="col in collections" :key="col.name" @click="filterByCategory(col.slug)" 
-                    class="group relative aspect-[4/5] md:aspect-square bg-zinc-100 overflow-hidden cursor-pointer border border-zinc-100 rounded-2xl shadow-sm transition-all duration-500">
+                <!-- Gumamit na tayo ng <Link> para mas malinis at direktang nagpapasok ng query param -->
+                <Link v-for="col in collections" :key="col.name" :href="route('archive.index', { category: col.slug })" 
+                      class="group relative aspect-[4/5] md:aspect-square bg-zinc-100 overflow-hidden cursor-pointer border border-zinc-100 rounded-2xl shadow-sm transition-all duration-500 block">
                     <img :src="col.img" class="w-full h-full object-cover grayscale opacity-70 group-hover:scale-105 group-hover:blur-[2px] transition-all duration-700" />
                     <div class="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/30 md:bg-black/20 md:opacity-0 md:group-hover:opacity-100 transition-all duration-500">
                         <div class="text-center md:translate-y-4 md:group-hover:translate-y-0 transition-all duration-500">
@@ -165,14 +172,14 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
                             <h3 class="text-xl md:text-2xl text-white uppercase italic tracking-tighter leading-none">{{ col.name }}</h3>
                         </div>
                     </div>
-                </div>
+                </Link>
             </div>
         </section>
 
         <section v-if="products && products.length > 0" class="bg-white py-16 md:py-20 border-b border-zinc-100">
             <div class="max-w-[1400px] mx-auto px-6 md:px-12">
                 <div class="flex flex-col gap-2 text-left mb-8">
-                    <span class="text-[9px] text-[#10B981] tracking-[0.8em] uppercase italic">Acquisition List</span>
+                    <span class="text-[9px] text-[#10B981] tracking-[0.8em] uppercase italic">Featured Products</span>
                     <h2 class="text-2xl md:text-5xl uppercase tracking-tighter italic leading-none">MOST <span class="text-zinc-200 not-italic">WANTED</span></h2>
                 </div>
                 <div class="relative flex items-center group">
@@ -193,7 +200,6 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
 
         <footer class="bg-zinc-50 pt-20 pb-24 md:pb-0 px-6 md:px-12 border-t border-zinc-200 text-left uppercase text-[9px] tracking-widest">
             <div class="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 border-b border-zinc-200 pb-12">
-                
                 <div class="space-y-6">
                     <div class="relative flex items-center">
                         <div class="bg-zinc-900 text-white h-9 px-2 flex items-center justify-center text-lg rounded-sm">
@@ -211,9 +217,9 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
                 </div>
                 
                 <div class="space-y-6">
-                    <h4 class="text-zinc-900 border-b border-zinc-200 pb-3 italic">Repository</h4>
+                    <h4 class="text-zinc-900 border-b border-zinc-200 pb-3 italic">Store</h4>
                     <ul class="space-y-4 text-zinc-500">
-                        <li><Link :href="route('archive.index')" class="hover:text-[#10B981] transition-colors">Index Units</Link></li>
+                        <li><Link :href="route('archive.index')" class="hover:text-[#10B981] transition-colors">All Products</Link></li>
                         <li v-for="col in collections" :key="col.slug">
                             <Link :href="route('archive.index', { category: col.slug })" class="hover:text-[#10B981] transition-colors">{{ col.name }}</Link>
                         </li>
@@ -221,17 +227,16 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
                 </div>
                 
                 <div class="space-y-6">
-                    <h4 class="text-zinc-900 border-b border-zinc-200 pb-3 italic">Network</h4>
+                    <h4 class="text-zinc-900 border-b border-zinc-200 pb-3 italic">Social</h4>
                     <div class="flex items-center gap-5 text-zinc-400">
                         <a href="#" class="hover:text-[#10B981] transition-all"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
                         <a href="#" class="hover:text-[#10B981] transition-all"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
                         <a href="#" class="hover:text-[#10B981] transition-all"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg></a>
-                        <a href="#" class="hover:text-[#10B981] transition-all"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
                     </div>
                 </div>
                 
                 <div class="space-y-6">
-                    <h4 class="text-zinc-900 border-b border-zinc-200 pb-3 italic">Update Log</h4>
+                    <h4 class="text-zinc-900 border-b border-zinc-200 pb-3 italic">Newsletter</h4>
                     <form @submit.prevent="subscribeNewsletter" class="flex flex-col gap-3 w-full">
                         <input type="email" placeholder="Enter Email Address" class="w-full bg-white border border-zinc-200 rounded-lg text-[10px] px-4 h-12 focus:border-zinc-900 focus:ring-0 placeholder:text-zinc-400 transition-all font-bold normal-case">
                         <button type="submit" class="w-full bg-zinc-900 text-white h-12 rounded-lg text-[9px] hover:bg-[#10B981] transition-all font-black uppercase tracking-widest shadow-sm">
@@ -259,16 +264,19 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('archive.index') ? 'text-zinc-900' : 'text-zinc-300']"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
                 <span class="text-[7px] uppercase tracking-widest" :class="[route().current('archive.index') ? 'text-zinc-900' : 'text-zinc-300']">Shop</span>
             </Link>
-            
             <Link :href="route('orders.index')" class="flex flex-col items-center gap-1.5">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('orders.index') ? 'text-zinc-900' : 'text-zinc-300']"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-                <span class="text-[7px] uppercase tracking-widest" :class="[route().current('orders.index') ? 'text-zinc-900' : 'text-zinc-300']">Orders</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('orders.*') ? 'text-zinc-900' : 'text-zinc-300']"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                <span class="text-[7px] uppercase tracking-widest" :class="[route().current('orders.*') ? 'text-zinc-900' : 'text-zinc-300']">Orders</span>
             </Link>
             
             <Link :href="route('cart.index')" class="relative flex flex-col items-center gap-1.5">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span v-if="displayCartCount > 0" class="absolute -top-1.5 right-0 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full z-20 border border-white shadow-sm">{{ displayCartCount }}</span>
-                <span class="text-[7px] uppercase tracking-widest" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Bag</span>
+                <div class="relative inline-block">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span v-if="displayCartCount > 0" class="absolute -top-2 -right-2.5 flex items-center justify-center min-w-[16px] h-[16px] px-1 text-[9px] bg-[#10B981] text-white rounded-full border-[2px] border-white font-black shadow-sm z-20">
+                        {{ displayCartCount }}
+                    </span>
+                </div>
+                <span class="text-[7px] uppercase tracking-widest" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Cart</span>
             </Link>
         </nav>
 

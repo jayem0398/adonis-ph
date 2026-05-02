@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     /**
-     * Display the Studio Operations Overview.
-     * Synchronized with real-time archive data.
+     * Display the Admin Dashboard Overview.
+     * Synchronized with real-time data.
      */
     public function index()
     {
@@ -29,12 +29,12 @@ class DashboardController extends Controller
                 'total_stock' => (int) ProductVariant::sum('stock'),
                 'low_stock_count' => ProductVariant::where('stock', '<', 5)->count(),
                 
-                // Recent Acquisitions Log (Latest 5 orders)
+                // Recent Orders (Latest 5 orders)
                 'recent_orders' => Order::latest()
                     ->take(5)
                     ->get(['id', 'first_name', 'last_name', 'total_amount', 'status', 'created_at']),
                 
-                // Critical Stock Units (Details for the Warning section)
+                // Low Stock Items
                 'low_stock_items' => ProductVariant::with('product')
                     ->where('stock', '<', 5)
                     ->orderBy('stock', 'asc')

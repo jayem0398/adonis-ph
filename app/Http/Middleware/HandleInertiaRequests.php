@@ -34,8 +34,8 @@ class HandleInertiaRequests extends Middleware
             ],
 
             /**
-             * Studio Flash Notifications
-             * Selyadong manifest para sa StudioNotification.vue
+             * System Flash Notifications
+             * Shared messages for StudioNotification.vue
              */
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
             ],
 
             /**
-             * Persistent Shopping Bag Stats (Database Driven)
+             * User Cart Item Count
              */
             'cartCount' => function () use ($request) {
                 if (!$request->user()) {

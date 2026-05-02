@@ -11,7 +11,7 @@ use Inertia\Inertia;
 class CartController extends Controller
 {
     /**
-     * Display the persistent cart archive.
+     * Display the user's cart.
      */
     public function index()
     {
@@ -44,7 +44,7 @@ class CartController extends Controller
     }
 
     /**
-     * Sync unit configuration to database archive.
+     * Add product variant to cart.
      */
     public function add(Request $request)
     {
@@ -56,7 +56,7 @@ class CartController extends Controller
         $variant = ProductVariant::findOrFail($request->variant_id);
         
         if ($variant->stock <= 0) {
-            return redirect()->back()->with('error', 'UNIT_UNAVAILABLE_STOCK_DEPLETED');
+            return redirect()->back()->with('error', 'Item is out of stock.');
         }
 
         $quantityToAdd = $request->quantity ?? 1;
@@ -79,11 +79,11 @@ class CartController extends Controller
             return redirect()->route('checkout.index');
         }
 
-        return redirect()->back()->with('success', 'UNIT_SYNCED_TO_DATABASE_ARCHIVE');
+        return redirect()->back()->with('success', 'Product added to cart.');
     }
 
     /**
-     * Update unit quantity in persistent storage.
+     * Update product quantity in cart.
      */
     public function update(Request $request, $id)
     {
@@ -96,15 +96,15 @@ class CartController extends Controller
             $cartItem->update(['quantity' => $request->quantity]);
         }
 
-        return redirect()->back()->with('success', 'ARCHIVE_QUANTITY_UPDATED');
+        return redirect()->back()->with('success', 'Cart updated successfully.');
     }
 
     /**
-     * Remove record from database archive.
+     * Remove item from cart.
      */
     public function destroy($id)
     {
         Cart::where('user_id', Auth::id())->findOrFail($id)->delete();
-        return redirect()->back()->with('success', 'RECORD_REMOVED_FROM_DATABASE');
+        return redirect()->back()->with('success', 'Item removed from cart.');
     }
 }
