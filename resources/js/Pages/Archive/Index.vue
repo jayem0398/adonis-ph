@@ -36,41 +36,36 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
 </script>
 
 <template>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-    <Head title="Archive Repository // Adonis Studio" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <Head title="Archive Repository | ADONIS STUDIO" />
 
-    <div class="min-h-screen bg-white flex flex-col antialiased text-zinc-900 font-['Inter'] selection:bg-[#10B981] selection:text-white overflow-x-hidden font-black">
+    <div class="min-h-screen bg-white flex flex-col antialiased text-zinc-900 font-['Inter'] selection:bg-[#10B981] selection:text-white overflow-x-hidden">
         
-        <nav :class="[isScrolled ? 'bg-white/95 backdrop-blur-md py-3 shadow-sm border-b border-zinc-100' : 'bg-white py-4 border-b border-zinc-50']" 
-             class="fixed top-0 w-full z-[110] transition-all duration-500 px-6 md:px-12 flex items-center justify-between font-black">
+        <nav :class="[isScrolled ? 'bg-white/95 backdrop-blur-md py-3 shadow-sm border-b border-zinc-100' : 'bg-white py-5 md:py-8 border-b border-zinc-50']" 
+             class="fixed top-0 w-full z-[110] transition-all duration-500 px-6 md:px-12 flex items-center justify-between">
+            <Link :href="route('welcome')" class="relative flex items-center group/nav">
+                <div class="bg-zinc-900 text-white h-7 md:h-9 px-2 flex items-center justify-center transition-all duration-500 group-hover/nav:md:px-5 relative overflow-hidden text-lg font-black">
+                    A<span class="max-w-0 overflow-hidden whitespace-nowrap text-[8px] tracking-[0.4em] transition-all duration-500 group-hover/nav:max-w-[100px] group-hover/nav:ml-2 uppercase hidden md:block">STUDIO</span>
+                </div>
+                <div class="flex flex-col ml-3 leading-none text-left">
+                    <span class="text-base md:text-lg font-black tracking-[-0.05em] uppercase transition-all group-hover/nav:tracking-widest duration-500 text-zinc-900">ADONIS</span>
+                    <span class="text-[5px] md:text-[6px] tracking-[0.45em] text-zinc-400 uppercase mt-0.5 italic font-bold">Philippines</span>
+                </div>
+            </Link>
             
-            <div class="flex items-center gap-10 font-black">
-                <Link :href="route('welcome')" class="relative flex items-center group/nav font-black">
-                    <div class="bg-zinc-900 text-white h-7 px-2 flex items-center justify-center transition-all duration-500 group-hover/nav:md:px-4 text-sm font-black italic">
-                        A<span class="max-w-0 overflow-hidden whitespace-nowrap text-[8px] tracking-[0.4em] transition-all duration-500 group-hover/nav:max-w-[100px] group-hover/nav:ml-2 uppercase italic hidden md:block">STUDIO</span>
-                    </div>
-                    <div class="flex flex-col ml-3 leading-none text-left">
-                        <span class="text-sm font-black tracking-[-0.05em] uppercase font-['Plus_Jakarta_Sans']">ADONIS</span>
-                        <span class="text-[5px] tracking-[0.45em] text-zinc-400 uppercase mt-0.5 italic font-bold">Lesbian Philippines</span>
-                    </div>
-                </Link>
-            </div>
-
-            <div class="flex items-center gap-10">
-
+            <div class="flex items-center gap-6 md:gap-10">
                 <Link :href="route('cart.index')" class="hidden md:block relative text-zinc-400 hover:text-[#10B981] transition-colors">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                    <span v-if="cartCount > 0" class="absolute -top-1.5 -right-2 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black">{{ cartCount }}</span>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span v-if="cartCount > 0" class="absolute -top-1.5 -right-2 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
                 </Link>
 
-                <Link :href="auth.user ? (isUserAdmin ? route('admin.dashboard') : route('profile.edit')) : route('login')" 
-                      class="text-zinc-400 hover:text-black transition-colors font-black">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                <Link :href="auth.user ? (isUserAdmin ? route('admin.dashboard') : route('profile.edit')) : route('login')" class="p-1 text-zinc-400 hover:text-zinc-900 transition-colors">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
                 </Link>
             </div>
         </nav>
 
-        <main class="mt-24 md:mt-32 max-w-[1200px] mx-auto w-full px-4 md:px-6 pb-28 text-left font-black">
+        <main class="flex-grow mt-24 md:mt-32 max-w-[1200px] mx-auto w-full px-4 md:px-6 pb-28 text-left font-black">
             <div class="flex flex-col gap-0.5 mb-8 border-b border-zinc-900 pb-4">
                 <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-bold italic">Step 01: Acquisition</span>
                 <h1 class="text-2xl md:text-4xl font-black uppercase tracking-tighter leading-none italic font-['Plus_Jakarta_Sans'] text-zinc-900">
@@ -97,7 +92,7 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
 
             <div v-if="products.length > 0" class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 <div v-for="product in products" :key="product.id">
-                    <ProductCard :product="product" />
+                    <ProductCard :product="product" :isAdmin="isUserAdmin" />
                 </div>
             </div>
 
@@ -117,23 +112,36 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
             </div>
         </main>
 
-        <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-zinc-100 z-[120] flex items-center justify-around py-3 px-4 shadow-[0_-15px_40px_rgba(0,0,0,0.08)] font-black">
-            <Link :href="route('welcome')" class="flex flex-col items-center gap-1 group">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('welcome') ? 'text-zinc-900' : 'text-zinc-300']"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                <span class="text-[7px] uppercase tracking-widest font-bold" :class="[route().current('welcome') ? 'text-zinc-900' : 'text-zinc-300']">Home</span>
+        <footer class="hidden md:block bg-zinc-50 py-8 px-6 md:px-12 border-t border-zinc-200 mt-auto">
+            <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-[8px] text-zinc-400 uppercase tracking-widest font-black">
+                <p>Copyright © 2026 Adonis Studio | All Rights Reserved</p>
+                <div class="flex gap-6">
+                    <Link href="#" class="hover:text-zinc-900 transition-colors">Privacy Policy</Link>
+                    <Link href="#" class="hover:text-zinc-900 transition-colors">Terms of Service</Link>
+                </div>
+            </div>
+        </footer>
+
+        <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-zinc-100 z-[120] flex items-center justify-around py-4 px-4 shadow-[0_-15px_40px_rgba(0,0,0,0.08)]">
+            <Link :href="route('welcome')" class="flex flex-col items-center gap-1.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('welcome') ? 'text-zinc-900' : 'text-zinc-300']"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('welcome') ? 'text-zinc-900' : 'text-zinc-300']">Home</span>
             </Link>
-            <Link :href="route('archive.index')" class="flex flex-col items-center gap-1 group">
+            
+            <Link :href="route('archive.index')" class="flex flex-col items-center gap-1.5">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('archive.index') ? 'text-zinc-900' : 'text-zinc-300']"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-                <span class="text-[7px] uppercase tracking-widest font-bold" :class="[route().current('archive.index') ? 'text-zinc-900' : 'text-zinc-300']">Shop</span>
+                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('archive.index') ? 'text-zinc-900' : 'text-zinc-300']">Shop</span>
             </Link>
-            <Link :href="route('cart.index')" class="relative flex flex-col items-center gap-1 group">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                <span v-if="cartCount > 0" class="absolute -top-1.5 right-0 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white">{{ cartCount }}</span>
-                <span class="text-[7px] uppercase tracking-widest font-bold" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Bag</span>
-            </Link>
-            <Link :href="route('orders.index')" class="flex flex-col items-center gap-1 group">
+            
+            <Link :href="route('orders.index')" class="flex flex-col items-center gap-1.5">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('orders.*') ? 'text-zinc-900' : 'text-zinc-300']"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-                <span class="text-[7px] uppercase tracking-widest font-bold" :class="[route().current('orders.*') ? 'text-zinc-900' : 'text-zinc-300']">Orders</span>
+                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('orders.*') ? 'text-zinc-900' : 'text-zinc-300']">Orders</span>
+            </Link>
+            
+            <Link :href="route('cart.index')" class="relative flex flex-col items-center gap-1.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <span v-if="cartCount > 0" class="absolute -top-1.5 right-0 text-[6px] bg-[#10B981] text-white px-1.5 py-0.5 rounded-full border border-white font-black shadow-sm">{{ cartCount }}</span>
+                <span class="text-[7px] uppercase tracking-widest font-black" :class="[route().current('cart.index') ? 'text-[#10B981]' : 'text-zinc-300']">Bag</span>
             </Link>
         </nav>
 
