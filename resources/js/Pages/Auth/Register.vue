@@ -29,81 +29,92 @@ const submit = () => {
 
 <template>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-    <Head title="Register | ADONIS" />
+    <Head title="Create Account | ADONIS STUDIO" />
 
-    <div class="min-h-screen bg-white flex flex-col selection:bg-[#10B981] selection:text-white font-['Inter'] font-black text-zinc-900 overflow-x-hidden">
+    <div class="min-h-screen bg-zinc-50 flex flex-col justify-center items-center antialiased text-zinc-900 font-['Inter'] selection:bg-[#10B981] selection:text-white font-black px-4 md:px-6 py-12">
         
-        <header class="py-12 text-center">
-            <Link href="/" class="text-[10px] font-black uppercase tracking-[0.8em] text-zinc-900">ADONIS<span class="text-zinc-400">PH</span></Link>
-        </header>
-
-        <div class="flex-1 flex flex-col justify-center items-center px-6 pb-24">
-            <div class="w-full max-w-md bg-white border border-zinc-100 rounded-2xl p-10 md:p-12 shadow-xl">
-                
-                <div class="mb-10 text-center">
-                    <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-black">New Registration</span>
-                    <h1 class="text-3xl font-black tracking-tighter text-zinc-900 uppercase mt-2 font-['Plus_Jakarta_Sans']">
-                        Join <span class="text-zinc-300">Studio</span>
-                    </h1>
+        <!-- SELYADO: Centered Logo Above Register Box -->
+        <div class="mb-10">
+            <Link :href="route('welcome')" class="flex items-center group">
+                <div class="bg-zinc-900 text-white h-9 px-3 flex items-center justify-center transition-all duration-500 text-xl font-black">
+                    A<span class="ml-2 uppercase text-[9px] tracking-[0.4em] hidden md:block">STUDIO</span>
                 </div>
-
-                <form @submit.prevent="submit" class="space-y-6 text-left">
-                    
-                    <div class="p-4 bg-zinc-50 border-l-2 border-zinc-900 rounded-r-xl">
-                        <p class="text-[7px] uppercase tracking-[0.3em] leading-relaxed text-zinc-500 font-black">
-                            Security Requirement: Passcode must exceed <span class="text-zinc-900">8 characters</span>.
-                        </p>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="block text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">Full Designation</label>
-                        <input v-model="form.name" type="text" required autofocus placeholder="YOUR NAME" 
-                            class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-black uppercase p-4 focus:bg-white focus:border-black outline-none transition-all placeholder:text-zinc-300">
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="block text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">Identity / Email</label>
-                        <input v-model="form.email" type="email" required placeholder="EMAIL@EXAMPLE.COM" 
-                            class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-black uppercase p-4 focus:bg-white focus:border-black outline-none transition-all placeholder:text-zinc-300">
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-1.5">
-                            <label class="block text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">Passcode</label>
-                            <input v-model="form.password" type="password" required placeholder="••••••••"
-                                class="w-full bg-zinc-50 border rounded-xl text-[10px] font-black p-4 focus:bg-white outline-none transition-all placeholder:text-zinc-300 tracking-widest"
-                                :class="!isPasswordLongEnough ? 'border-red-300 focus:border-red-500' : 'border-zinc-100 focus:border-black'">
-                            <p v-if="!isPasswordLongEnough" class="text-[7px] text-red-500 uppercase tracking-widest mt-1 italic font-black">Min 8 Chars</p>
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="block text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">Verify Passcode</label>
-                            <input v-model="form.password_confirmation" type="password" required placeholder="••••••••"
-                                class="w-full bg-zinc-50 border rounded-xl text-[10px] font-black p-4 focus:bg-white outline-none transition-all placeholder:text-zinc-300 tracking-widest"
-                                :class="!passwordsMatch ? 'border-red-300 focus:border-red-500' : 'border-zinc-100 focus:border-black'">
-                            <p v-if="!passwordsMatch" class="text-[7px] text-red-500 uppercase tracking-widest mt-1 italic font-black">Mismatch</p>
-                        </div>
-                    </div>
-
-                    <div class="pt-4 space-y-6">
-                        <button type="submit" :disabled="form.processing || !passwordsMatch || !isPasswordLongEnough" 
-                            class="group flex items-center justify-between w-full h-16 bg-zinc-900 text-white px-8 rounded-2xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-[#10B981] transition-all shadow-2xl active:scale-95 disabled:opacity-50">
-                            <span>Establish</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </button>
-
-                        <div class="flex justify-center items-center pt-6 border-t border-zinc-50">
-                            <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-400 mr-3">Already Active?</p>
-                            <Link :href="route('login')" class="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-900 hover:text-[#10B981] transition-colors">Authenticate</Link>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                <div class="flex flex-col ml-3 leading-none text-left">
+                    <span class="text-xl font-black tracking-[-0.05em] uppercase text-zinc-900">ADONIS</span>
+                    <span class="text-[6px] tracking-[0.45em] text-zinc-400 uppercase mt-0.5 italic font-bold">Philippines</span>
+                </div>
+            </Link>
         </div>
 
-        <footer class="py-10 text-center">
-            <p class="text-[7px] font-black uppercase tracking-[1em] text-zinc-300 pointer-events-none italic">© 2026 Adonis Studio</p>
-        </footer>
+        <!-- SELYADO: Distraction-Free Register Form with Normal E-commerce Words -->
+        <main class="w-full max-w-md bg-white border border-zinc-200 rounded-2xl p-8 md:p-12 shadow-xl relative overflow-hidden">
+            
+            <div class="mb-10 text-center">
+                <span class="text-[8px] text-[#10B981] tracking-[0.6em] uppercase font-black italic">New Customer</span>
+                <h1 class="text-3xl font-black tracking-tighter text-zinc-900 uppercase mt-2 font-['Plus_Jakarta_Sans'] italic">
+                    Create <span class="text-zinc-300">Account</span>
+                </h1>
+            </div>
+
+            <form @submit.prevent="submit" class="space-y-6 text-left">
+                
+                <div class="p-4 bg-zinc-50 border-l-2 border-zinc-900 rounded-r-xl">
+                    <p class="text-[7px] uppercase tracking-[0.3em] leading-relaxed text-zinc-500 font-black">
+                        Security: Password must be at least <span class="text-zinc-900">8 characters</span>.
+                    </p>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="block text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">Full Name</label>
+                    <input v-model="form.name" type="text" required autofocus placeholder="ENTER FULL NAME" 
+                        class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-black uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all placeholder:text-zinc-300">
+                    <div v-if="form.errors.name" class="text-[7px] text-red-500 font-black uppercase tracking-widest mt-1">{{ form.errors.name }}</div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="block text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">Email Address</label>
+                    <input v-model="form.email" type="email" required placeholder="ENTER EMAIL" 
+                        class="w-full bg-zinc-50 border border-zinc-100 rounded-xl text-[10px] font-black uppercase p-4 focus:bg-white focus:border-zinc-900 outline-none transition-all placeholder:text-zinc-300">
+                    <div v-if="form.errors.email" class="text-[7px] text-red-500 font-black uppercase tracking-widest mt-1">{{ form.errors.email }}</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">Password</label>
+                        <input v-model="form.password" type="password" required placeholder="••••••••"
+                            class="w-full bg-zinc-50 border rounded-xl text-[10px] font-black p-4 focus:bg-white outline-none transition-all placeholder:text-zinc-300 tracking-widest"
+                            :class="!isPasswordLongEnough && form.password ? 'border-red-300 focus:border-red-500' : 'border-zinc-100 focus:border-zinc-900'">
+                        <p v-if="!isPasswordLongEnough && form.password" class="text-[7px] text-red-500 uppercase tracking-widest mt-1 italic font-black">Min 8 Chars</p>
+                        <div v-if="form.errors.password" class="text-[7px] text-red-500 font-black uppercase tracking-widest mt-1">{{ form.errors.password }}</div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400">Confirm Password</label>
+                        <input v-model="form.password_confirmation" type="password" required placeholder="••••••••"
+                            class="w-full bg-zinc-50 border rounded-xl text-[10px] font-black p-4 focus:bg-white outline-none transition-all placeholder:text-zinc-300 tracking-widest"
+                            :class="!passwordsMatch && form.password_confirmation ? 'border-red-300 focus:border-red-500' : 'border-zinc-100 focus:border-zinc-900'">
+                        <p v-if="!passwordsMatch && form.password_confirmation" class="text-[7px] text-red-500 uppercase tracking-widest mt-1 italic font-black">Mismatch</p>
+                    </div>
+                </div>
+
+                <div class="pt-4 space-y-6">
+                    <button type="submit" :disabled="form.processing || !passwordsMatch || !isPasswordLongEnough" 
+                        class="group flex items-center justify-between w-full h-14 bg-zinc-900 text-white px-8 rounded-xl text-[10px] font-black uppercase tracking-[0.4em] hover:bg-[#10B981] transition-all shadow-xl active:scale-95 disabled:opacity-50">
+                        <span>{{ form.processing ? 'Creating...' : 'Create Account' }}</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+
+                    <div class="flex justify-center items-center pt-6 border-t border-zinc-100">
+                        <p class="text-[8px] uppercase tracking-[0.3em] text-zinc-400 mr-3">Already have an account?</p>
+                        <Link :href="route('login')" class="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-900 hover:text-[#10B981] transition-colors">Sign In</Link>
+                    </div>
+                </div>
+            </form>
+        </main>
 
         <StudioNotification />
     </div>
 </template>
+
+<style scoped>
+input { -webkit-tap-highlight-color: transparent; }
+</style>
